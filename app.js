@@ -132,7 +132,6 @@ const fetchingDataFromFireStore = async () => {
       });
       console.log(posts);
 
-
       //! Getting and manipulating input search from the user
 
       let inputFromSearch = document.getElementById("searchInput");
@@ -329,6 +328,41 @@ const fetchingDataFromFireStore = async () => {
             <br/>
             <b class = "text-base-300">${postContent}</b>
             <br/>
+            <br/>
+<div>
+  <label for="OrderNotes" class="sr-only">Order notes</label>
+
+  <div
+    class="overflow-hidden bg-white rounded-lg border border-gray-200 shadow-xl focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600"
+  >
+    <textarea
+      id="OrderNotes"
+      class="w-full resize-none border-none align-top focus:ring-0 sm:text-sm bg-white p-4"
+      rows="4"
+      placeholder="Comment or Ask Anything you want to ?"
+    ></textarea>
+
+    <div class="flex items-center justify-end gap-2 bg-white p-3">
+      <button
+        type="button"
+        class="rounded bg-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-600"
+      >
+        Clear
+      </button>
+
+      <button
+        type="button"
+        class="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
+        onclick = "AddComments()"
+        >
+        Add
+      </button>
+    </div>
+  </div>
+</div>
+<h1 class = "mt-3 text-base-300"><b>Comments</b></h1>
+<div id = "commentBox" class = "mt-2">
+</div>
           </p>
     
           <div class="mt-4 md:mt-8">
@@ -348,6 +382,19 @@ const fetchingDataFromFireStore = async () => {
         class="h-full w-full object-cover sm:h-[calc(100%_-_2rem)] sm:self-end sm:rounded-ss-[30px] md:h-[calc(100%_-_4rem)] md:rounded-ss-[60px]"
       />
     </section>`;
+
+          window.AddComments = function () {
+            let commentValue = document.getElementById("OrderNotes");
+            let commentsDiv = document.getElementById("commentBox");
+            if (commentValue.value.trim()) {
+              commentsDiv.innerHTML += `<div class="chat chat-start">
+              <div class="chat-bubble chat-bubble-white">${commentValue.value}</div>
+              </div>`;
+            } else {
+              alert("Please enter a valid note!");
+            }
+          };
+
           window.backToHome = function () {
             blogsDisplay.style.display = "none";
             displayPost.style.display = "block";
