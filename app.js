@@ -229,6 +229,7 @@ const fetchingDataFromFireStore = async () => {
         inputFromSearch &&
         inputFromSearch.addEventListener("keyup", searchFunction);
 
+      //! Mapping all the posts on the main Page
       itemCollection = posts.map(
         (collectionOfposts) =>
           ` <a
@@ -331,7 +332,6 @@ const fetchingDataFromFireStore = async () => {
             <br/>
 <div>
   <label for="OrderNotes" class="sr-only">Order notes</label>
-
   <div
     class="overflow-hidden bg-white rounded-lg border border-gray-200 shadow-xl focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600"
   >
@@ -346,7 +346,8 @@ const fetchingDataFromFireStore = async () => {
       <button
         type="button"
         class="rounded bg-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-600"
-      >
+        onclick = "clearAll()"
+        >
         Clear
       </button>
 
@@ -395,6 +396,11 @@ const fetchingDataFromFireStore = async () => {
             }
           };
 
+          window.clearAll = function(){
+            let commentValue = document.getElementById("OrderNotes");
+            commentValue.value = " ";
+          }
+
           window.backToHome = function () {
             blogsDisplay.style.display = "none";
             displayPost.style.display = "block";
@@ -404,18 +410,6 @@ const fetchingDataFromFireStore = async () => {
         } else {
           console.log("HTML ki file se masla araha hai");
         }
-
-        // if (currentPageName === "index.html") {
-        //   window.location.href = "postDisplay.html";
-        // }
-        //     console.log("Working bro")
-        //     console.log(id);
-        //     console.log(postContent)
-        //   console.log(title)
-        //   console.log(userName);
-        //   console.log(userEmail);
-        //   console.log(readingTime);
-        //   console.log(publishDate)
       };
     });
   });
@@ -485,6 +479,9 @@ const loginWithEmailAndPassword = () => {
       if (currentPageName !== "index.html") {
         window.location.href = "index.html";
       }
+      email.value = " ";
+      password.value = " ";
+      alert(`Signed In as ${user.email}`);
       // ...
     })
     .catch((error) => {
@@ -499,6 +496,9 @@ const signUpwithEmail = () => {
     .then((userCredential) => {
       let user = userCredential.user;
       console.log(user);
+      email.value = " ";
+      password.value = " ";
+      alert("Account created for " + user.email);
     })
     .catch((error) => {
       console.log(error);
