@@ -15,6 +15,7 @@ import {
 //! Firestore Database configuration
 
 import {
+  where,
   getFirestore,
   onSnapshot,
   collection,
@@ -23,7 +24,7 @@ import {
   updateDoc,
   deleteDoc,
   query,
-  getDocs,
+  getDoc,
 } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -78,6 +79,7 @@ let loginPage = document.getElementById("loginPage");
 //! Write Button of Home Page
 let writeButton = document.getElementById("writeButton");
 let writingPost = document.getElementById("writingPost");
+let homePageButton = document.getElementById("homePage");
 
 let imageSrc =
   "https://icon-library.com/images/guest-account-icon/guest-account-icon-6.jpg";
@@ -85,8 +87,6 @@ let imageSrc =
 //! Post Related Content
 let publishButton = document.getElementById("submitButton");
 let displayPost = document.getElementById("allPosts");
-let viewFullPage = document.getElementById("viewFullPage");
-
 
 //! Uploading Data to the Firesore
 const uploadingDataInFireStore = async () => {
@@ -96,10 +96,13 @@ const uploadingDataInFireStore = async () => {
   let readingTime = document.getElementById("readingTime").value;
   let postCategory = document.getElementById("categoryOfBlog").value;
   let contentOfPost = document.getElementById("contentOfPost").value;
+  let userName = document.getElementById("userName").value;
 
+  //! Converting Date into timestamp
   const idForDb = new Date().getTime();
   const payload = {
     Id: idForDb,
+    nameOfUser: userName,
     title: postTitle,
     publishDate: postPublish,
     email: postEmail,
@@ -119,20 +122,119 @@ publishButton &&
 //! Getting data from the database
 
 const fetchingDataFromFireStore = async () => {
-  let itemCollection = "";
-  const q = query(collection(db, "posts"));
-  const unsubscribe = onSnapshot(q, (querySnapshot) => {
-    const posts = [];
-    querySnapshot.forEach((doc) => {
-      posts.push(doc.data());
-    });
-    console.log(posts);
-    itemCollection = posts
-      .map(
+  document.addEventListener("DOMContentLoaded", function () {
+    let itemCollection = "";
+    const q = query(collection(db, "posts"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const posts = [];
+      querySnapshot.forEach((doc) => {
+        posts.push(doc.data());
+      });
+      console.log(posts);
+
+
+      //! Getting and manipulating input search from the user
+
+      let inputFromSearch = document.getElementById("searchInput");
+      const searchFunction = () => {
+        const inputValue = inputFromSearch.value.toLowerCase();
+        console.log(inputFromSearch.value);
+        posts.filter(async (collectionOfposts) => {
+          if (inputValue.trim()) {
+            if (collectionOfposts.title.toLowerCase().includes(inputValue)) {
+              const docRef = doc(db, "posts", `${collectionOfposts.Id}`);
+              const docSnap = await getDoc(docRef);
+              if (docSnap.exists()) {
+                displayPost.style.display = "block";
+                displayPost.innerHTML = ` <a
+              href="#"
+              class="relative block overflow-hidden rounded-lg border border-black p-4 sm:p-6 lg:p-8 m-5 mb-1 shadow-xl"
+            >
+              <span
+                class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"
+              ></span>
+      
+              
+              <div class="sm:flex sm:justify-between sm:gap-4">
+                <div>
+                  <h3 class="text-lg font-bold text-indigo-600 sm:text-xl">
+                    ${docSnap.data().title}
+                  </h3>
+      
+                  <p class="mt-1 text-xs font-medium text-white">${
+                    docSnap.data().email
+                  }</p>
+                </div>
+      
+                <div class="hidden sm:block sm:shrink-0">
+                  <img
+                    alt="Paul Clapton"
+                    src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80"
+                    class="h-16 w-16 rounded-lg object-cover shadow-sm"
+                  />
+                </div>
+              </div>
+      
+              <div class="mt-4">
+                <p class="max-w-[40ch] text-sm text-black">
+                 <h3 class = "text-indigo-600"> ${
+                   docSnap.data().nameOfUser
+                 } <h3> | <span class = "text-base-200"> ${
+                  collectionOfposts.email
+                } </span>
+                </p>
+              </div>
+      
+              <dl class="mt-6 flex gap-4 sm:gap-6">
+                <div class="flex flex-col-reverse">
+                  <dt class="text-sm font-medium text-gray-400">Published</dt>
+                  <dd class="text-xs text-base-200">${
+                    docSnap.data().publishDate
+                  }</dd>
+                </div>
+      
+                <div class="flex flex-col-reverse">
+                  <dt class="text-sm font-medium text-gray-400">Reading time</dt>
+                  <dd class="text-xs text-base-200">${
+                    docSnap.data().readTime
+                  }</dd>
+                </div>
+              </dl>
+              <br/>
+              <button
+              type="button"
+              class="block w-full rounded-lg px-5 py-3 text-sm font-medium text-white btn btn-outline btn-success"
+              id="fullPost"
+              onclick = "seefullPost('${docSnap.data().Id}', '${
+                  docSnap.data().title
+                }', '${docSnap.data().nameOfUser}', '${
+                  docSnap.data().email
+                }', '${docSnap.data().readTime}', '${
+                  docSnap.data().publishDate
+                }', '${docSnap.data().content}')";
+              >
+              View Full Post
+            </button>
+            </a>`;
+                console.log("Document data:", docSnap.data());
+              } else {
+                console.log("No such document!");
+              }
+            }
+          } else {
+            window.location.reload();
+          }
+        });
+      };
+      inputFromSearch &&
+        inputFromSearch &&
+        inputFromSearch.addEventListener("keyup", searchFunction);
+
+      itemCollection = posts.map(
         (collectionOfposts) =>
           ` <a
             href="#"
-            class="relative block overflow-hidden rounded-lg border border-black p-4 sm:p-6 lg:p-8 m-5 shadow-xl"
+            class="relative block overflow-hidden rounded-lg border border-black p-4 sm:p-6 lg:p-8 m-5 mb-1 shadow-xl"
           >
             <span
               class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"
@@ -159,7 +261,7 @@ const fetchingDataFromFireStore = async () => {
     
             <div class="mt-4">
               <p class="max-w-[40ch] text-sm text-black">
-                ${collectionOfposts.content}
+               <h3 class = "text-indigo-600"> ${collectionOfposts.nameOfUser} <h3> | <span class = "text-base-200"> ${collectionOfposts.email} </span>
               </p>
             </div>
     
@@ -179,38 +281,105 @@ const fetchingDataFromFireStore = async () => {
             type="button"
             class="block w-full rounded-lg px-5 py-3 text-sm font-medium text-white btn btn-outline btn-success"
             id="fullPost"
-            onclick = "seefullPost('${collectionOfposts.Id}, ${collectionOfposts.content}, ${collectionOfposts.title}, ${collectionOfposts.readTime}, ${collectionOfposts.publishDate}, ${collectionOfposts.email}')";
+            onclick = "seefullPost('${collectionOfposts.Id}', '${collectionOfposts.title}', '${collectionOfposts.nameOfUser}', '${collectionOfposts.email}', '${collectionOfposts.readTime}', '${collectionOfposts.publishDate}', '${collectionOfposts.content}')";
             >
             View Full Post
           </button>
           </a>`
-      )
-  
-    window.seefullPost = (id, content, title, readtime, publishDate, email) => {
-      if(currentPageName !== "fullPost.html"){
-      // window.location.href = "fullPost.html"
-      }
-console.log(id)
-  }
-    // displayTodo.style.display = "block";
-    displayPost.innerHTML = itemCollection;
+      );
+      displayPost.style.display = "block";
+      displayPost.innerHTML = itemCollection;
+      window.seefullPost = function (
+        id,
+        title,
+        userName,
+        userEmail,
+        readingTime,
+        publishDate,
+        postContent
+      ) {
+        let blogsDisplay = document.getElementById("showingPosts");
+        console.log("ye function to chal raha hai");
+        if (blogsDisplay) {
+          displayPost.style.display = "none";
+          blogsDisplay.style.display = "block";
+          console.log(
+            "Brother mein to chal raha hun Allah jane display kyun nahi araha hai"
+          );
+          blogsDisplay.innerHTML = `
+    <section class="overflow-hidden bg-gray-50 sm:grid sm:grid-cols-2 sm:items-center">
+      <div class="p-8 md:p-12 lg:px-16 lg:py-24">
+        <div class="mx-auto max-w-xl text-center ltr:sm:text-left rtl:sm:text-right">
+          <h2 class="text-2xl font-bold text-gray-900 md:text-3xl">
+            ${title}
+          </h2>
+    
+          <p class="hidden text-gray-500 md:mt-4 md:block">
+            Author's Name : <b>${userName}</b>
+            <br/>
+            Author's Email : <b>${userEmail}</b>
+            <br/>
+            Reading Time : <b>${readingTime}</b>
+            <br/>
+            publish Date : <b>${publishDate}</b>
+            <br/>
+            <br/>
+            <span class = "text-indigo-600 m-3">Content of the Post</span>
+            <br/>
+            <br/>
+            <b class = "text-base-300">${postContent}</b>
+            <br/>
+          </p>
+    
+          <div class="mt-4 md:mt-8">
+            <a
+              onclick = "backToHome()"
+              class="inline-block rounded bg-emerald-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-emerald-700 focus:outline-none focus:ring focus:ring-yellow-400"
+            >
+              Back To HomePage
+            </a>
+          </div>
+        </div>
+      </div>
+    
+      <img
+        alt=""
+        src = "https://i.pinimg.com/originals/d3/46/4a/d3464a4351fdf340ccb6bb37c281381a.gif"
+        class="h-full w-full object-cover sm:h-[calc(100%_-_2rem)] sm:self-end sm:rounded-ss-[30px] md:h-[calc(100%_-_4rem)] md:rounded-ss-[60px]"
+      />
+    </section>`;
+          window.backToHome = function () {
+            blogsDisplay.style.display = "none";
+            displayPost.style.display = "block";
+            console.log("Han bhai han jaraha hun yaar");
+          };
+          console.log("Load bhi horaha hai");
+        } else {
+          console.log("HTML ki file se masla araha hai");
+        }
+
+        // if (currentPageName === "index.html") {
+        //   window.location.href = "postDisplay.html";
+        // }
+        //     console.log("Working bro")
+        //     console.log(id);
+        //     console.log(postContent)
+        //   console.log(title)
+        //   console.log(userName);
+        //   console.log(userEmail);
+        //   console.log(readingTime);
+        //   console.log(publishDate)
+      };
+    });
   });
 };
 
 fetchingDataFromFireStore();
-// const newUser = {
-//    Email: email,
-//    Password: password,
-//    Name: nameOfUser,
-//  };
 
 //! Crucial and the most important function for checking whether user is logged in or not
 const init = () => {
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      // if (currentPageName !== "index.html") {
-      //   window.location.href = "index.html";
-      // }
       console.log(user);
       photoUrl = user.photoURL;
       imageDisplay.src = photoUrl;
@@ -252,6 +421,9 @@ const signUpWithGoogle = () => {
   signInWithPopup(auth, provider)
     .then((result) => {
       console.log(result);
+      if (currentPageName !== "index.html") {
+        window.location.href = "index.html";
+      }
     })
     .catch((error) => {
       console.log(error);
@@ -263,6 +435,9 @@ const loginWithEmailAndPassword = () => {
   signInWithEmailAndPassword(auth, email.value, password.value)
     .then((userCredential) => {
       const user = userCredential.user;
+      if (currentPageName !== "index.html") {
+        window.location.href = "index.html";
+      }
       // ...
     })
     .catch((error) => {
@@ -330,5 +505,13 @@ emailLogin &&
 writingPost &&
   writingPost &&
   writingPost.addEventListener("click", () => {
-    window.location.replace("writePost.html");
+    window.location.href = "writePost.html";
+  });
+
+homePageButton &&
+  homePageButton &&
+  homePageButton.addEventListener("click", () => {
+    if (currentPageName === "writePost.html") {
+      window.location.href = "index.html";
+    }
   });

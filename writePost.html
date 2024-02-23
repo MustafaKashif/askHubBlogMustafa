@@ -10,6 +10,9 @@
       rel="stylesheet"
       type="text/css"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
 <body class="bg-white">
@@ -30,8 +33,7 @@
         </div>
   
         <div class="rounded-lg bg-white p-8 shadow-xl lg:col-span-3 lg:p-12">
-          <form action="#" class="space-y-4">
-            <div>
+          <div class="my-4">
               <label class="sr-only" for="name">Title Of Post</label>
               <input
                 class="w-full rounded-lg border-gray-200 p-3 text-sm bg-white border border-indigo-600 shadow-xl"
@@ -53,8 +55,21 @@
               </div>
 
             </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-1">
+              <div class="my-4">
+                <label class="sr-only" for="username">User Name</label>
+                <input
+                  class="w-full rounded-lg border-gray-200 p-3 text-sm bg-white border border-indigo-600 shadow-xl"
+                  placeholder="Enter your Name "
+                  type="text"
+                  id="userName"
+                />
+              </div>
+
+            </div>
   
-            <div class="grid grid-cols-1 gap-4 text-center sm:grid-cols-3">
+  
+            <div class="grid grid-cols-1 gap-4 text-center sm:grid-cols-3 mb-4">
    
 
    <div>
@@ -105,9 +120,14 @@
               >
                 Publish Post
               </button>
+            <button
+            class=" mt-4 inline-block w-full rounded-lg bg-black px-5 py-3 font-medium text-white sm:w-auto"
+            id="homePage"
+            >
+              Go to Home Page
+            </button>  
             </div>
-          </form>
-        </div>
+        </div> 
       </div>
     </div>
   </section>
