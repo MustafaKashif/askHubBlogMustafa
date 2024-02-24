@@ -421,7 +421,7 @@ const fetchingDataFromFireStore = async () => {
          ` <div class="chat chat-start">
          <div class="chat-bubble chat-bubble-base-600">${comment.comments}</div>
        </div>` 
-        );
+        ).join(" ");
         commentsDiv.innerHTML = collectionOfreplies;
       }
       });  
