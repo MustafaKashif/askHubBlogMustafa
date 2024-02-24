@@ -24,7 +24,8 @@ import {
   updateDoc,
   deleteDoc,
   query,
-  getDoc,
+  getDoc, 
+  getDocs,
 } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -81,6 +82,9 @@ let writeButton = document.getElementById("writeButton");
 let writingPost = document.getElementById("writingPost");
 let homePageButton = document.getElementById("homePage");
 
+let getStarted = document.getElementById("startedButton");
+
+
 let imageSrc =
   "https://icon-library.com/images/guest-account-icon/guest-account-icon-6.jpg";
 
@@ -98,6 +102,8 @@ const uploadingDataInFireStore = async () => {
   let contentOfPost = document.getElementById("contentOfPost").value;
   let userName = document.getElementById("userName").value;
 
+  //! Commenting related things
+  // let commentValue = document.getElementById("OrderNotes").value;
   //! Converting Date into timestamp
   const idForDb = new Date().getTime();
   const payload = {
@@ -114,8 +120,8 @@ const uploadingDataInFireStore = async () => {
   alert("Post Added Successfully !");
   console.log(payload);
 };
-
 publishButton &&
+  publishButton &&
   publishButton &&
   publishButton.addEventListener("click", uploadingDataInFireStore);
 
@@ -247,13 +253,13 @@ const fetchingDataFromFireStore = async () => {
                   ${collectionOfposts.title}
                 </h3>
     
-                <p class="mt-1 text-xs font-medium text-white">${collectionOfposts.email}</p>
+                <p class="mt-1 text-xs font-medium text-sky-500">${collectionOfposts.email}</p>
               </div>
     
               <div class="hidden sm:block sm:shrink-0">
                 <img
                   alt="Paul Clapton"
-                  src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80"
+                  src="https://wallpapers.com/images/hd/black-and-white-cartoon-2bdhvbnld9j4gr1j.jpg"
                   class="h-16 w-16 rounded-lg object-cover shadow-sm"
                 />
               </div>
@@ -261,18 +267,18 @@ const fetchingDataFromFireStore = async () => {
     
             <div class="mt-4">
               <p class="max-w-[40ch] text-sm text-black">
-               <h3 class = "text-indigo-600"> ${collectionOfposts.nameOfUser} <h3> | <span class = "text-base-200"> ${collectionOfposts.email} </span>
+               <h3 class = "text-indigo-600"> ${collectionOfposts.nameOfUser} <h3> | <span class = "text-base-400"> ${collectionOfposts.email} </span>
               </p>
             </div>
     
             <dl class="mt-6 flex gap-4 sm:gap-6">
               <div class="flex flex-col-reverse">
-                <dt class="text-sm font-medium text-gray-400">Published</dt>
+                <dt class="text-sm font-medium text-base-600">Published</dt>
                 <dd class="text-xs text-base-200">${collectionOfposts.publishDate}</dd>
               </div>
     
               <div class="flex flex-col-reverse">
-                <dt class="text-sm font-medium text-gray-400">Reading time</dt>
+                <dt class="text-sm font-medium text-base-600">Reading time</dt>
                 <dd class="text-xs text-base-200">${collectionOfposts.readTime}</dd>
               </div>
             </dl>
@@ -281,7 +287,7 @@ const fetchingDataFromFireStore = async () => {
             type="button"
             class="block w-full rounded-lg px-5 py-3 text-sm font-medium text-white btn btn-outline btn-success"
             id="fullPost"
-            onclick = "seefullPost('${collectionOfposts.Id}', '${collectionOfposts.title}', '${collectionOfposts.nameOfUser}', '${collectionOfposts.email}', '${collectionOfposts.readTime}', '${collectionOfposts.publishDate}', '${collectionOfposts.content}')";
+            onclick = "seefullPost('${collectionOfposts.Id}', '${collectionOfposts.title}', '${collectionOfposts.nameOfUser}', '${collectionOfposts.email}', '${collectionOfposts.readTime}', '${collectionOfposts.publishDate}', '${collectionOfposts.content}', '${collectionOfposts.comments}')";
             >
             View Full Post
           </button>
@@ -327,7 +333,7 @@ const fetchingDataFromFireStore = async () => {
             <span class = "text-indigo-600 m-3">Content of the Post</span>
             <br/>
             <br/>
-            <b class = "text-base-300">${postContent}</b>
+            <b class = "text-base-600">${postContent}</b>
             <br/>
             <br/>
 <div>
@@ -336,7 +342,7 @@ const fetchingDataFromFireStore = async () => {
     class="overflow-hidden bg-white rounded-lg border border-gray-200 shadow-xl focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600"
   >
     <textarea
-      id="OrderNotes"
+      id= "OrderNotes"
       class="w-full resize-none border-none align-top focus:ring-0 sm:text-sm bg-white p-4"
       rows="4"
       placeholder="Comment or Ask Anything you want to ?"
@@ -354,15 +360,17 @@ const fetchingDataFromFireStore = async () => {
       <button
         type="button"
         class="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
-        onclick = "AddComments()"
+        onclick = "AddComments('${id}')"
         >
         Add
       </button>
     </div>
   </div>
 </div>
-<h1 class = "mt-3 text-base-300"><b>Comments</b></h1>
+<h1 class = "mt-3 text-base-600"><b>Comments</b></h1>
 <div id = "commentBox" class = "mt-2">
+
+              
 </div>
           </p>
     
@@ -379,27 +387,56 @@ const fetchingDataFromFireStore = async () => {
     
       <img
         alt=""
-        src = "https://i.pinimg.com/originals/d3/46/4a/d3464a4351fdf340ccb6bb37c281381a.gif"
+        src = "https://i.pinimg.com/originals/3a/2d/18/3a2d1887c04c541022449a57c7a30793.gif"
         class="h-full w-full object-cover sm:h-[calc(100%_-_2rem)] sm:self-end sm:rounded-ss-[30px] md:h-[calc(100%_-_4rem)] md:rounded-ss-[60px]"
       />
     </section>`;
 
-          window.AddComments = function () {
-            let commentValue = document.getElementById("OrderNotes");
+          window.AddComments = async function (id) {
+            let collectionOfreplies = ""
+            let commentValue = document.getElementById("OrderNotes").value;
             let commentsDiv = document.getElementById("commentBox");
-            if (commentValue.value.trim()) {
-              commentsDiv.innerHTML += `<div class="chat chat-start">
-              <div class="chat-bubble chat-bubble-white">${commentValue.value}</div>
-              </div>`;
-            } else {
-              alert("Please enter a valid note!");
-            }
-          };
+            console.log(id);
+            if (commentValue.trim()) {
+             const idd = new Date().getTime()
+             const payload = {
+              Id: idd,
+              BlogId : id,
+              nameOfUser: userName,
+              comments :  commentValue,
+             };
+             await(setDoc(doc(db, `${id}`, `${idd}`), payload));
+             console.log("replies added successfully");
+             console.log(payload);
 
-          window.clearAll = function(){
+     const q = query(collection(db, `${id}`));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const replies = [];
+      querySnapshot.forEach((doc) => {
+        replies.push(doc.data());
+      });
+      console.log(replies);
+      if(id == id){
+      collectionOfreplies = replies.map((comment) => 
+         ` <div class="chat chat-start">
+         <div class="chat-bubble chat-bubble-base-600">${comment.comments}</div>
+       </div>` 
+        );
+        commentsDiv.innerHTML = collectionOfreplies;
+      }
+      });  
+  
+          } else {
+            alert("Enter a valid Note !");
+          }
+        };
+
+        
+
+          window.clearAll = function () {
             let commentValue = document.getElementById("OrderNotes");
             commentValue.value = " ";
-          }
+          };
 
           window.backToHome = function () {
             blogsDisplay.style.display = "none";
@@ -414,7 +451,6 @@ const fetchingDataFromFireStore = async () => {
     });
   });
 };
-
 fetchingDataFromFireStore();
 
 //! Crucial and the most important function for checking whether user is logged in or not
@@ -561,4 +597,9 @@ homePageButton &&
     if (currentPageName === "writePost.html") {
       window.location.href = "index.html";
     }
+  });
+getStarted &&
+  getStarted &&
+  getStarted.addEventListener("click", () => {
+    window.location.href = "login.html";
   });
