@@ -261,7 +261,7 @@ const fetchingDataFromFireStore = async () => {
               <div class="hidden sm:block sm:shrink-0">
                 <img
                   alt="Paul Clapton"
-                  src="${collectionOfposts.displayPhoto}"
+                  src="${collectionOfposts.displayPhoto == null ? collectionOfposts.displayPhoto = "https://cdn.pixabay.com/photo/2023/10/03/10/49/anonymous-8291223_1280.png" : collectionOfposts.displayPhoto}"
                   class="h-16 w-16 rounded-lg object-cover shadow-sm"
                 />
               </div>
