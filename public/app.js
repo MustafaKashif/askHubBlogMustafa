@@ -109,7 +109,7 @@ const uploadingDataInFireStore = async () => {
   const idForDb = new Date().getTime();
   const payload = {
     Id: idForDb,
-    nameOfUser: mainUserName,
+    nameOfUser: userName,
     title: postTitle,
     publishDate: postPublish,
     email: postEmail,
@@ -427,11 +427,11 @@ const fetchingDataFromFireStore = async () => {
                         `<div class="chat chat-start">
                         <div class="chat-image avatar">
                           <div class="w-10 rounded-full">
-                            <img alt="Tailwind CSS chat bubble component" src="${comment.imageDisplay}" />
+                            <img alt="Tailwind CSS chat bubble component" src="${comment.imageDisplay == null ? comment.imageDisplay = "https://cdn.pixabay.com/photo/2023/10/03/10/49/anonymous-8291223_1280.png" : comment.imageDisplay }" />
                           </div>
                         </div>
                         <div class="chat-header text-base-400">
-                          ${comment.nameOfUser}
+                          ${comment.nameOfUser == null ? comment.nameOfUser = "Anonymous"  : comment.nameOfUser }
                           <time class="text-xs opacity-50">${new Date().toTimeString()}</time>
                         </div>
                         <div class="chat-bubble">${comment.comments}</div>
