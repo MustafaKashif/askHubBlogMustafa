@@ -24,7 +24,7 @@ import {
   updateDoc,
   deleteDoc,
   query,
-  getDoc, 
+  getDoc,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
 
@@ -46,6 +46,8 @@ const db = getFirestore(app);
 
 //! To get the current path of the page in string format
 const currentPageName = window.location.pathname.split("/").pop();
+let mainUserName;
+let maindisplayPhoto;
 
 //! Just declared a variable for use in authStateChanged Function
 let photoUrl;
@@ -84,7 +86,6 @@ let homePageButton = document.getElementById("homePage");
 
 let getStarted = document.getElementById("startedButton");
 
-
 let imageSrc =
   "https://icon-library.com/images/guest-account-icon/guest-account-icon-6.jpg";
 
@@ -108,13 +109,14 @@ const uploadingDataInFireStore = async () => {
   const idForDb = new Date().getTime();
   const payload = {
     Id: idForDb,
-    nameOfUser: userName,
+    nameOfUser: mainUserName,
     title: postTitle,
     publishDate: postPublish,
     email: postEmail,
     readTime: readingTime,
     category: postCategory,
     content: contentOfPost,
+    displayPhoto : maindisplayPhoto,
   };
   await setDoc(doc(db, "posts", `${idForDb}`), payload);
   alert("Post Added Successfully !");
@@ -223,7 +225,7 @@ const fetchingDataFromFireStore = async () => {
             </a>`;
                 console.log("Document data:", docSnap.data());
               } else {
-                console.log("No such document!");
+                alert("No such Post !");
               }
             }
           } else {
@@ -259,7 +261,7 @@ const fetchingDataFromFireStore = async () => {
               <div class="hidden sm:block sm:shrink-0">
                 <img
                   alt="Paul Clapton"
-                  src="https://wallpapers.com/images/hd/black-and-white-cartoon-2bdhvbnld9j4gr1j.jpg"
+                  src="${collectionOfposts.displayPhoto}"
                   class="h-16 w-16 rounded-lg object-cover shadow-sm"
                 />
               </div>
@@ -393,45 +395,60 @@ const fetchingDataFromFireStore = async () => {
     </section>`;
 
           window.AddComments = async function (id) {
-            let collectionOfreplies = ""
+            let collectionOfreplies = "";
             let commentValue = document.getElementById("OrderNotes").value;
             let commentsDiv = document.getElementById("commentBox");
             console.log(id);
             if (commentValue.trim()) {
-             const idd = new Date().getTime()
-             const payload = {
-              Id: idd,
-              BlogId : id,
-              nameOfUser: userName,
-              comments :  commentValue,
-             };
-             await(setDoc(doc(db, `${id}`, `${idd}`), payload));
-             console.log("replies added successfully");
-             console.log(payload);
+              const idd = new Date().getTime();
+              const payload = {
+                Id: idd,
+                BlogId: id,
+                nameOfUser: mainUserName,
+                comments: commentValue,
+                imageDisplay : maindisplayPhoto,
+              };
+              await setDoc(doc(db, `${id}`, `${idd}`), payload);
+              console.log("replies added successfully");
+              console.log(payload);
 
-     const q = query(collection(db, `${id}`));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const replies = [];
-      querySnapshot.forEach((doc) => {
-        replies.push(doc.data());
-      });
-      console.log(replies);
-      if(id == id){
-      collectionOfreplies = replies.map((comment) => 
-         ` <div class="chat chat-start">
-         <div class="chat-bubble chat-bubble-base-600">${comment.comments}</div>
-       </div>` 
-        ).join(" ");
-        commentsDiv.innerHTML = collectionOfreplies;
-      }
-      });  
-  
-          } else {
-            alert("Enter a valid Note !");
-          }
-        };
-
-        
+              const q = query(collection(db, `${id}`));
+              const unsubscribe = onSnapshot(q, (querySnapshot) => {
+                const replies = [];
+                querySnapshot.forEach((doc) => {
+                  replies.push(doc.data());
+                });
+                console.log(replies);
+                // alert("comment Added !");
+                if (id == id) {
+                  collectionOfreplies = replies
+                    .map(
+                      (comment) =>
+                        `<div class="chat chat-start">
+                        <div class="chat-image avatar">
+                          <div class="w-10 rounded-full">
+                            <img alt="Tailwind CSS chat bubble component" src="${comment.imageDisplay}" />
+                          </div>
+                        </div>
+                        <div class="chat-header text-base-400">
+                          ${comment.nameOfUser}
+                          <time class="text-xs opacity-50">${new Date().toTimeString()}</time>
+                        </div>
+                        <div class="chat-bubble">${comment.comments}</div>
+                        <div class="chat-footer opacity-50">
+                          Delivered
+                        </div>
+                      </div>
+                      `
+                    )
+                    .join(" ");
+                  commentsDiv.innerHTML = collectionOfreplies;
+                }
+              });
+            } else {
+              alert("Enter a valid Note !");
+            }
+          };
 
           window.clearAll = function () {
             let commentValue = document.getElementById("OrderNotes");
@@ -458,6 +475,8 @@ const init = () => {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       console.log(user);
+      mainUserName = user.displayName;
+      maindisplayPhoto = user.photoURL;
       photoUrl = user.photoURL;
       imageDisplay.src = photoUrl;
       if (user.displayName === null) {
